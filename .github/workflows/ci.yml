@@ -20,6 +20,7 @@ on:
     branches:
       - dev
       - master
+      - custom-music-player-ui
     paths-ignore:
       - 'README.md'
       - 'doc/**'
