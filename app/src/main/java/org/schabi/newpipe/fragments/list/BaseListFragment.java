@@ -314,11 +314,13 @@ public abstract class BaseListFragment<I, N> extends BaseStateFragment<I>
     }
 
     private void onStreamDownload(final StreamInfoItem selectedItem) {
-        if (!PermissionHelper.checkStoragePermissions(activity, PermissionHelper.DOWNLOAD_DIALOG_REQUEST_CODE)) {
+        if (!PermissionHelper.checkStoragePermissions(activity,
+                PermissionHelper.DOWNLOAD_DIALOG_REQUEST_CODE)) {
             return;
         }
 
-        downloadDisposables.add(ExtractorHelper.getStreamInfo(selectedItem.getServiceId(), selectedItem.getUrl(), false)
+        downloadDisposables.add(ExtractorHelper.getStreamInfo(selectedItem.getServiceId(),
+                        selectedItem.getUrl(), false)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(info -> {
