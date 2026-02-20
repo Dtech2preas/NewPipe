@@ -1032,45 +1032,51 @@ public abstract class VideoPlayerUi extends PlayerUi implements SeekBar.OnSeekBa
             binding.playbackEndTime.setVisibility(View.GONE);
             binding.playbackLiveSync.setVisibility(View.GONE);
 
-            switch (info.getStreamType()) {
-                case AUDIO_STREAM:
-                case POST_LIVE_AUDIO_STREAM:
-                    binding.surfaceView.setVisibility(View.GONE);
-                    binding.endScreen.setVisibility(View.VISIBLE);
-                    binding.playbackEndTime.setVisibility(View.VISIBLE);
-                    break;
-
-                case AUDIO_LIVE_STREAM:
-                    binding.surfaceView.setVisibility(View.GONE);
-                    binding.endScreen.setVisibility(View.VISIBLE);
-                    binding.playbackLiveSync.setVisibility(View.VISIBLE);
-                    break;
-
-                case LIVE_STREAM:
-                    binding.surfaceView.setVisibility(View.VISIBLE);
-                    binding.endScreen.setVisibility(View.GONE);
-                    binding.playbackLiveSync.setVisibility(View.VISIBLE);
-                    break;
-
-                case VIDEO_STREAM:
-                case POST_LIVE_STREAM:
-                    if (player.getCurrentMetadata() != null
-                            && player.getCurrentMetadata().getMaybeQuality().isEmpty()
-                            || (info.getVideoStreams().isEmpty()
-                            && info.getVideoOnlyStreams().isEmpty())) {
+            if (player.isAudioOnly()) {
+                binding.surfaceView.setVisibility(View.GONE);
+                binding.endScreen.setVisibility(View.VISIBLE);
+                binding.playbackEndTime.setVisibility(View.VISIBLE);
+            } else {
+                switch (info.getStreamType()) {
+                    case AUDIO_STREAM:
+                    case POST_LIVE_AUDIO_STREAM:
+                        binding.surfaceView.setVisibility(View.GONE);
+                        binding.endScreen.setVisibility(View.VISIBLE);
+                        binding.playbackEndTime.setVisibility(View.VISIBLE);
                         break;
-                    }
 
-                    buildQualityMenu();
-                    buildAudioTrackMenu();
+                    case AUDIO_LIVE_STREAM:
+                        binding.surfaceView.setVisibility(View.GONE);
+                        binding.endScreen.setVisibility(View.VISIBLE);
+                        binding.playbackLiveSync.setVisibility(View.VISIBLE);
+                        break;
 
-                    binding.qualityTextView.setVisibility(View.VISIBLE);
-                    binding.surfaceView.setVisibility(View.VISIBLE);
-                    // fallthrough
-                default:
-                    binding.endScreen.setVisibility(View.GONE);
-                    binding.playbackEndTime.setVisibility(View.VISIBLE);
-                    break;
+                    case LIVE_STREAM:
+                        binding.surfaceView.setVisibility(View.VISIBLE);
+                        binding.endScreen.setVisibility(View.GONE);
+                        binding.playbackLiveSync.setVisibility(View.VISIBLE);
+                        break;
+
+                    case VIDEO_STREAM:
+                    case POST_LIVE_STREAM:
+                        if (player.getCurrentMetadata() != null
+                                && player.getCurrentMetadata().getMaybeQuality().isEmpty()
+                                || (info.getVideoStreams().isEmpty()
+                                && info.getVideoOnlyStreams().isEmpty())) {
+                            break;
+                        }
+
+                        buildQualityMenu();
+                        buildAudioTrackMenu();
+
+                        binding.qualityTextView.setVisibility(View.VISIBLE);
+                        binding.surfaceView.setVisibility(View.VISIBLE);
+                        // fallthrough
+                    default:
+                        binding.endScreen.setVisibility(View.GONE);
+                        binding.playbackEndTime.setVisibility(View.VISIBLE);
+                        break;
+                }
             }
 
             buildPlaybackSpeedMenu();
