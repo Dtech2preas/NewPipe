@@ -2,6 +2,7 @@ package org.schabi.newpipe.info_list.holder;
 
 import android.text.TextUtils;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import org.schabi.newpipe.R;
@@ -38,6 +39,7 @@ import org.schabi.newpipe.util.Localization;
 
 public class StreamInfoItemHolder extends StreamMiniInfoItemHolder {
     public final TextView itemAdditionalDetails;
+    public final ImageButton itemDownloadButton;
 
     public StreamInfoItemHolder(final InfoItemBuilder infoItemBuilder, final ViewGroup parent) {
         this(infoItemBuilder, R.layout.list_stream_item, parent);
@@ -47,6 +49,7 @@ public class StreamInfoItemHolder extends StreamMiniInfoItemHolder {
                                 final ViewGroup parent) {
         super(infoItemBuilder, layoutId, parent);
         itemAdditionalDetails = itemView.findViewById(R.id.itemAdditionalDetails);
+        itemDownloadButton = itemView.findViewById(R.id.itemDownloadButton);
     }
 
     @Override
@@ -60,6 +63,14 @@ public class StreamInfoItemHolder extends StreamMiniInfoItemHolder {
         final StreamInfoItem item = (StreamInfoItem) infoItem;
 
         itemAdditionalDetails.setText(getStreamInfoDetailLine(item));
+
+        if (itemDownloadButton != null) {
+            itemDownloadButton.setOnClickListener(view -> {
+                if (itemBuilder.getOnStreamDownloadListener() != null) {
+                    itemBuilder.getOnStreamDownloadListener().selected(item);
+                }
+            });
+        }
     }
 
     private String getStreamInfoDetailLine(final StreamInfoItem infoItem) {

@@ -14,6 +14,7 @@ import org.schabi.newpipe.util.OnClickGesture
 
 class InfoItemBuilder(val context: Context) {
     var onStreamSelectedListener: OnClickGesture<StreamInfoItem>? = null
+    var onStreamDownloadListener: OnClickGesture<StreamInfoItem>? = null
     var onChannelSelectedListener: OnClickGesture<ChannelInfoItem>? = null
     var onPlaylistSelectedListener: OnClickGesture<PlaylistInfoItem>? = null
     var onCommentsSelectedListener: OnClickGesture<CommentsInfoItem>? = null
