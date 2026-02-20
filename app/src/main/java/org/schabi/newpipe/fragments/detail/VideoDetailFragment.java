@@ -898,6 +898,7 @@ public final class VideoDetailFragment
         tabIcons.clear();
         tabContentDescriptions.clear();
 
+        /*
         if (shouldShowComments()) {
             pageAdapter.addFragment(
                     CommentsFragment.getInstance(serviceId, url, title), COMMENTS_TAB_TAG);
@@ -918,6 +919,7 @@ public final class VideoDetailFragment
             tabIcons.add(R.drawable.ic_description);
             tabContentDescriptions.add(R.string.description_tab_description);
         }
+        */
 
         if (pageAdapter.getCount() == 0) {
             pageAdapter.addFragment(EmptyFragment.newInstance(true), EMPTY_TAB_TAG);
@@ -1477,7 +1479,6 @@ public final class VideoDetailFragment
             binding.detailContentRootHiding.setVisibility(View.INVISIBLE);
         }
 
-        animate(binding.detailThumbnailPlayButton, false, 50);
         animate(binding.detailDurationView, false, 100);
         binding.detailPositionView.setVisibility(View.GONE);
         binding.positionView.setVisibility(View.GONE);
@@ -1513,7 +1514,6 @@ public final class VideoDetailFragment
 
         updateTabs(info);
 
-        animate(binding.detailThumbnailPlayButton, true, 200);
         binding.detailVideoTitleView.setText(title);
 
         binding.detailSubChannelThumbnailView.setVisibility(View.GONE);
@@ -1615,17 +1615,9 @@ public final class VideoDetailFragment
             }
         }
 
-        binding.detailControlsDownload.setVisibility(
-                StreamTypeUtil.isLiveStream(info.getStreamType()) ? View.GONE : View.VISIBLE);
-        binding.detailControlsBackground.setVisibility(
-                info.getAudioStreams().isEmpty() && info.getVideoStreams().isEmpty()
-                        ? View.GONE : View.VISIBLE);
-
-        final boolean noVideoStreams =
-                info.getVideoStreams().isEmpty() && info.getVideoOnlyStreams().isEmpty();
-        binding.detailControlsPopup.setVisibility(noVideoStreams ? View.GONE : View.VISIBLE);
-        binding.detailThumbnailPlayButton.setImageResource(
-                noVideoStreams ? R.drawable.ic_headset_shadow : R.drawable.ic_play_arrow_shadow);
+        binding.detailControlsDownload.setVisibility(View.GONE);
+        binding.detailControlsBackground.setVisibility(View.GONE);
+        binding.detailControlsPopup.setVisibility(View.GONE);
     }
 
     private void displayUploaderAsSubChannel(final StreamInfo info) {

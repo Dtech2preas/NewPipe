@@ -186,8 +186,7 @@
                                 android:textStyle="bold"
                                 android:visibility="gone"
                                 tools:ignore="HardcodedText,RtlHardcoded"
-                                tools:text="English (United States) original"
-                                tools:visibility="visible" />
+                                tools:text="English (United States) original" />
                         </FrameLayout>
 
                     </LinearLayout>
@@ -203,6 +202,7 @@
                         android:padding="@dimen/player_main_buttons_padding"
                         android:textColor="@android:color/white"
                         android:textStyle="bold"
+                        android:visibility="gone"
                         tools:ignore="HardcodedText,RtlHardcoded"
                         tools:text="720p" />
 
@@ -217,6 +217,7 @@
                         android:padding="@dimen/player_main_buttons_padding"
                         android:textColor="@android:color/white"
                         android:textStyle="bold"
+                        android:visibility="gone"
                         tools:ignore="RtlHardcoded,RtlSymmetry"
                         tools:text="1x" />
 
@@ -269,6 +270,7 @@
                         android:padding="@dimen/player_main_buttons_padding"
                         android:scaleType="fitXY"
                         android:src="@drawable/ic_expand_more"
+                        android:visibility="gone"
                         app:tint="@color/white"
                         tools:ignore="RtlHardcoded" />
 
@@ -279,9 +281,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="top"
-                    android:visibility="invisible"
-                    tools:ignore="RtlHardcoded"
-                    tools:visibility="visible">
+                    android:visibility="gone"
+                    tools:ignore="RtlHardcoded">
 
                     <org.schabi.newpipe.views.NewPipeTextView
                         android:id="@+id/resizeTextView"

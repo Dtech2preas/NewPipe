@@ -56,9 +56,8 @@
                         android:layout_gravity="center"
                         android:background="@android:color/transparent"
                         android:src="@drawable/ic_play_arrow_shadow"
-                        android:visibility="invisible"
-                        tools:ignore="ContentDescription"
-                        tools:visibility="visible" />
+                        android:visibility="gone"
+                        tools:ignore="ContentDescription" />
 
                     <org.schabi.newpipe.views.NewPipeTextView
                         android:id="@+id/touch_append_detail"
@@ -437,7 +436,8 @@
                             android:gravity="center"
                             android:paddingVertical="@dimen/detail_control_padding"
                             android:text="@string/controls_background_title"
-                            android:textSize="@dimen/detail_control_text_size" />
+                            android:textSize="@dimen/detail_control_text_size"
+                            android:visibility="gone" />
 
                         <org.schabi.newpipe.views.NewPipeTextView
                             android:id="@+id/detail_controls_popup"
@@ -453,7 +453,8 @@
                             android:gravity="center"
                             android:paddingVertical="@dimen/detail_control_padding"
                             android:text="@string/controls_popup_title"
-                            android:textSize="@dimen/detail_control_text_size" />
+                            android:textSize="@dimen/detail_control_text_size"
+                            android:visibility="gone" />
 
                         <org.schabi.newpipe.views.NewPipeTextView
                             android:id="@+id/detail_controls_download"
@@ -469,7 +470,8 @@
                             android:gravity="center"
                             android:paddingVertical="@dimen/detail_control_padding"
                             android:text="@string/download"
-                            android:textSize="@dimen/detail_control_text_size" />
+                            android:textSize="@dimen/detail_control_text_size"
+                            android:visibility="gone" />
 
                     </LinearLayout>
 
@@ -481,8 +483,7 @@
                         android:orientation="horizontal"
                         android:paddingHorizontal="@dimen/detail_control_padding"
                         android:paddingBottom="@dimen/detail_control_padding"
-                        android:visibility="gone"
-                        tools:visibility="visible">
+                        android:visibility="gone">
 
                         <org.schabi.newpipe.views.NewPipeTextView
                             android:id="@+id/detail_controls_share"

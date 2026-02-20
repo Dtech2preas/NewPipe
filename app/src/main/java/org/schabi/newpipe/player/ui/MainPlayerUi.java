@@ -219,7 +219,7 @@ public final class MainPlayerUi extends VideoPlayerUi implements View.OnLayoutCh
 
         // Make sure video and text tracks are enabled if the user is in the app, in the case user
         // switched from background player to main player
-        player.useVideoAndSubtitles(fragmentIsVisible);
+        player.useVideoAndSubtitles(false);
     }
 
     @Override
@@ -276,12 +276,12 @@ public final class MainPlayerUi extends VideoPlayerUi implements View.OnLayoutCh
         showHideKodiButton();
         binding.fullScreenButton.setVisibility(View.GONE);
         setupScreenRotationButton();
-        binding.resizeTextView.setVisibility(View.VISIBLE);
+        binding.resizeTextView.setVisibility(View.GONE);
         binding.getRoot().findViewById(R.id.metadataView).setVisibility(View.VISIBLE);
-        binding.moreOptionsButton.setVisibility(View.VISIBLE);
+        binding.moreOptionsButton.setVisibility(View.GONE);
         binding.topControls.setOrientation(LinearLayout.VERTICAL);
         binding.primaryControls.getLayoutParams().width = MATCH_PARENT;
-        binding.secondaryControls.setVisibility(View.INVISIBLE);
+        binding.secondaryControls.setVisibility(View.GONE);
         binding.moreOptionsButton.setImageDrawable(AppCompatResources.getDrawable(context,
                 R.drawable.ic_expand_more));
         binding.share.setVisibility(View.VISIBLE);
@@ -293,10 +293,14 @@ public final class MainPlayerUi extends VideoPlayerUi implements View.OnLayoutCh
         binding.topControls.setClickable(true);
         binding.topControls.setFocusable(true);
 
-        binding.metadataView.setVisibility(isFullscreen ? View.VISIBLE : View.GONE);
+        binding.metadataView.setVisibility(View.VISIBLE);
 
         // Reset workaround changes from popup player
         binding.audioTrackTextView.setMaxWidth(Integer.MAX_VALUE);
+
+        binding.queueButton.setVisibility(View.GONE);
+        binding.segmentsButton.setVisibility(View.GONE);
+        binding.addToPlaylistButton.setVisibility(View.GONE);
     }
 
     @Override
@@ -335,7 +339,7 @@ public final class MainPlayerUi extends VideoPlayerUi implements View.OnLayoutCh
         } else if (VideoDetailFragment.ACTION_VIDEO_FRAGMENT_RESUMED.equals(intent.getAction())) {
             // Restore video source when user returns to the fragment
             fragmentIsVisible = true;
-            player.useVideoAndSubtitles(true);
+            player.useVideoAndSubtitles(false);
 
             // When a user returns from background, the system UI will always be shown even if
             // controls are invisible: hide it in that case
@@ -439,16 +443,8 @@ public final class MainPlayerUi extends VideoPlayerUi implements View.OnLayoutCh
             return;
         }
 
-        final boolean showQueue = !playQueue.getStreams().isEmpty();
-        final boolean showSegment = !player.getCurrentStreamInfo()
-                .map(StreamInfo::getStreamSegments)
-                .map(List::isEmpty)
-                .orElse(/*no stream info=*/true);
-
-        binding.queueButton.setVisibility(showQueue ? View.VISIBLE : View.GONE);
-        binding.queueButton.setAlpha(showQueue ? 1.0f : 0.0f);
-        binding.segmentsButton.setVisibility(showSegment ? View.VISIBLE : View.GONE);
-        binding.segmentsButton.setAlpha(showSegment ? 1.0f : 0.0f);
+        binding.queueButton.setVisibility(View.GONE);
+        binding.segmentsButton.setVisibility(View.GONE);
     }
 
     @Override
