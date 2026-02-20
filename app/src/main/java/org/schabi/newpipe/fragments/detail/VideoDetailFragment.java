@@ -1349,7 +1349,7 @@ public final class VideoDetailFragment
             }
         } else {
             final int height = (int) (isPortrait
-                    ? metrics.widthPixels / (16.0f / 9.0f)
+                    ? metrics.widthPixels // Square for music player look
                     : metrics.heightPixels / 2.0f);
             setHeightThumbnail(height, metrics);
         }
@@ -1481,6 +1481,7 @@ public final class VideoDetailFragment
         animate(binding.detailDurationView, false, 100);
         binding.detailPositionView.setVisibility(View.GONE);
         binding.positionView.setVisibility(View.GONE);
+        binding.overlayProgressBar.setVisibility(View.GONE);
 
         binding.detailVideoTitleView.setText(title);
         binding.detailVideoTitleView.setMaxLines(1);
@@ -1712,6 +1713,7 @@ public final class VideoDetailFragment
                 }, () -> {
                     binding.positionView.setVisibility(View.GONE);
                     binding.detailPositionView.setVisibility(View.GONE);
+                    binding.overlayProgressBar.setVisibility(View.GONE);
                 });
     }
 
@@ -1726,10 +1728,13 @@ public final class VideoDetailFragment
         final int progressDifference = Math.abs(binding.positionView.getProgress()
                 - progressSeconds);
         binding.positionView.setMax(durationSeconds);
+        binding.overlayProgressBar.setMax(durationSeconds);
         if (progressDifference > 2) {
             binding.positionView.setProgressAnimated(progressSeconds);
+            binding.overlayProgressBar.setProgressAnimated(progressSeconds);
         } else {
             binding.positionView.setProgress(progressSeconds);
+            binding.overlayProgressBar.setProgress(progressSeconds);
         }
         final String position = Localization.getDurationString(progressSeconds);
         if (position != binding.detailPositionView.getText()) {
@@ -1738,6 +1743,7 @@ public final class VideoDetailFragment
         if (binding.positionView.getVisibility() != View.VISIBLE) {
             animate(binding.positionView, true, 100);
             animate(binding.detailPositionView, true, 100);
+            animate(binding.overlayProgressBar, true, 100);
         }
     }
 
@@ -1806,6 +1812,7 @@ public final class VideoDetailFragment
                         && player.getPlayQueue().getItem().getUrl().equals(url)) {
                     animate(binding.positionView, true, 100);
                     animate(binding.detailPositionView, true, 100);
+                    animate(binding.overlayProgressBar, true, 100);
                 }
                 break;
         }

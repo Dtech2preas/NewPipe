@@ -103,6 +103,10 @@ public class InfoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         infoItemBuilder.setOnStreamSelectedListener(listener);
     }
 
+    public void setOnStreamDownloadListener(final OnClickGesture<StreamInfoItem> listener) {
+        infoItemBuilder.setOnStreamDownloadListener(listener);
+    }
+
     public void setOnChannelSelectedListener(final OnClickGesture<ChannelInfoItem> listener) {
         infoItemBuilder.setOnChannelSelectedListener(listener);
     }

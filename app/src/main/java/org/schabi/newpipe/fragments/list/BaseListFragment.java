@@ -27,9 +27,12 @@ import org.schabi.newpipe.fragments.BaseStateFragment;
 import org.schabi.newpipe.fragments.OnScrollBelowItemsListener;
 import org.schabi.newpipe.info_list.InfoListAdapter;
 import org.schabi.newpipe.info_list.ItemViewMode;
+import org.schabi.newpipe.download.DownloadDialog;
 import org.schabi.newpipe.info_list.dialog.InfoItemDialog;
+import org.schabi.newpipe.util.ExtractorHelper;
 import org.schabi.newpipe.util.NavigationHelper;
 import org.schabi.newpipe.util.OnClickGesture;
+import org.schabi.newpipe.util.PermissionHelper;
 import org.schabi.newpipe.util.StateSaver;
 import org.schabi.newpipe.util.ThemeHelper;
 import org.schabi.newpipe.views.SuperScrollLayoutManager;
@@ -37,6 +40,10 @@ import org.schabi.newpipe.views.SuperScrollLayoutManager;
 import java.util.List;
 import java.util.Queue;
 import java.util.function.Supplier;
+
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public abstract class BaseListFragment<I, N> extends BaseStateFragment<I>
         implements ListViewContract<I, N>, StateSaver.WriteRead,
@@ -46,6 +53,8 @@ public abstract class BaseListFragment<I, N> extends BaseStateFragment<I>
 
     private boolean useDefaultStateSaving = true;
     private int updateFlags = 0;
+
+    protected final CompositeDisposable downloadDisposables = new CompositeDisposable();
 
     /*//////////////////////////////////////////////////////////////////////////
     // Views
@@ -79,6 +88,7 @@ public abstract class BaseListFragment<I, N> extends BaseStateFragment<I>
     @Override
     public void onDestroy() {
         super.onDestroy();
+        downloadDisposables.clear();
         if (useDefaultStateSaving) {
             StateSaver.onDestroy(savedState);
         }
@@ -287,8 +297,38 @@ public abstract class BaseListFragment<I, N> extends BaseStateFragment<I>
 
         infoListAdapter.setOnCommentsSelectedListener(this::onItemSelected);
 
+        infoListAdapter.setOnStreamDownloadListener(new OnClickGesture<>() {
+            @Override
+            public void selected(final StreamInfoItem selectedItem) {
+                onStreamDownload(selectedItem);
+            }
+
+            @Override
+            public void held(final StreamInfoItem selectedItem) {
+                // do nothing
+            }
+        });
+
         // Ensure that there is always a scroll listener (e.g. when rotating the device)
         useNormalItemListScrollListener();
+    }
+
+    private void onStreamDownload(final StreamInfoItem selectedItem) {
+        if (!PermissionHelper.checkStoragePermissions(activity,
+                PermissionHelper.DOWNLOAD_DIALOG_REQUEST_CODE)) {
+            return;
+        }
+
+        downloadDisposables.add(ExtractorHelper.getStreamInfo(selectedItem.getServiceId(),
+                        selectedItem.getUrl(), false)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(info -> {
+                    final DownloadDialog downloadDialog = new DownloadDialog(activity, info);
+                    downloadDialog.show(getFM(), "download_dialog");
+                }, throwable -> {
+                    ErrorUtil.showUiErrorSnackbar(this, "Fetching stream info", throwable);
+                }));
     }
 
     /**

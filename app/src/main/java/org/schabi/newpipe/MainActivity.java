@@ -264,6 +264,7 @@ public class MainActivity extends AppCompatActivity {
      */
     private void addDrawerMenuForCurrentService() throws ExtractionException {
         //Tabs
+        /*
         drawerLayoutBinding.navigation.getMenu()
                 .add(R.id.menu_tabs_group, ITEM_ID_SUBSCRIPTIONS, ORDER,
                         R.string.tab_subscriptions)
@@ -274,6 +275,7 @@ public class MainActivity extends AppCompatActivity {
         drawerLayoutBinding.navigation.getMenu()
                 .add(R.id.menu_tabs_group, ITEM_ID_BOOKMARKS, ORDER, R.string.tab_bookmarks)
                 .setIcon(R.drawable.ic_bookmark);
+         */
         drawerLayoutBinding.navigation.getMenu()
                 .add(R.id.menu_tabs_group, ITEM_ID_DOWNLOADS, ORDER, R.string.downloads)
                 .setIcon(R.drawable.ic_file_download);
@@ -846,7 +848,10 @@ public class MainActivity extends AppCompatActivity {
                         searchString);
 
             } else {
-                NavigationHelper.gotoMainFragment(getSupportFragmentManager());
+                NavigationHelper.openSearchFragment(
+                        getSupportFragmentManager(),
+                        ServiceHelper.getSelectedServiceId(this),
+                        "");
             }
         } catch (final Exception e) {
             ErrorUtil.showUiErrorSnackbar(this, "Handling intent", e);
