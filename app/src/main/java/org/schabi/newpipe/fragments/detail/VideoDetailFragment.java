@@ -480,11 +480,11 @@ public final class VideoDetailFragment
             if (isPlayerAvailable()) {
                 player.setRecovery();
             }
-            openVideoPlayerAutoFullscreen();
+            openVideoPlayer(false);
         });
 
-        binding.detailControlsBackground.setOnClickListener(v -> openBackgroundPlayer(false));
-        binding.detailControlsPopup.setOnClickListener(v -> openPopupPlayer(false));
+        binding.detailControlsBackground.setVisibility(View.GONE);
+        binding.detailControlsPopup.setVisibility(View.GONE);
         binding.detailControlsPlaylistAppend.setOnClickListener(makeOnClickListener(info -> {
             if (getFM() != null && currentInfo != null) {
                 final Fragment fragment = getParentFragmentManager().
@@ -570,6 +570,12 @@ public final class VideoDetailFragment
         ));
         binding.detailControlsDownload.setOnLongClickListener(makeOnLongClickListener(info ->
                 NavigationHelper.openDownloads(activity)));
+
+        // Remove listeners for hidden buttons
+        binding.detailControlsBackground.setOnClickListener(null);
+        binding.detailControlsPopup.setOnClickListener(null);
+        binding.detailControlsBackground.setOnLongClickListener(null);
+        binding.detailControlsPopup.setOnLongClickListener(null);
 
         final View.OnLongClickListener overlayListener = makeOnLongClickListener(info ->
                 openChannel(info.getUploaderUrl(), info.getUploaderName()));
