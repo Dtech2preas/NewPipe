@@ -460,66 +460,26 @@ public final class VideoDetailFragment
     //////////////////////////////////////////////////////////////////////////*/
 
     private void setOnClickListeners() {
-        binding.detailTitleRootLayout.setOnClickListener(v -> toggleTitleAndSecondaryControls());
-        binding.detailUploaderRootLayout.setOnClickListener(makeOnClickListener(info -> {
-            if (isEmpty(info.getSubChannelUrl())) {
-                if (!isEmpty(info.getUploaderUrl())) {
-                    openChannel(info.getUploaderUrl(), info.getUploaderName());
-                }
-
-                if (DEBUG) {
-                    Log.i(TAG, "Can't open sub-channel because we got no channel URL");
-                }
+        // Redesigned Music Player Listeners
+        binding.btnPlayPause.setOnClickListener(v -> {
+            if (playerIsNotStopped()) {
+                player.playPause();
             } else {
-                openChannel(info.getSubChannelUrl(), info.getSubChannelName());
+                autoPlayEnabled = true;
+                openVideoPlayer(false);
             }
-        }));
-        binding.detailThumbnailRootLayout.setOnClickListener(v -> {
-            autoPlayEnabled = true; // forcefully start playing
-            // FIXME Workaround #7427
-            if (isPlayerAvailable()) {
-                player.setRecovery();
-            }
-            openVideoPlayer(false);
+            updatePlayPauseButtons();
         });
 
-        binding.detailControlsBackground.setVisibility(View.GONE);
-        binding.detailControlsPopup.setVisibility(View.GONE);
-        binding.detailControlsPlaylistAppend.setOnClickListener(makeOnClickListener(info -> {
-            if (getFM() != null && currentInfo != null) {
-                final Fragment fragment = getParentFragmentManager().
-                        findFragmentById(R.id.fragment_holder);
-
-                // commit previous pending changes to database
-                if (fragment instanceof LocalPlaylistFragment) {
-                    ((LocalPlaylistFragment) fragment).saveImmediate();
-                } else if (fragment instanceof MainFragment) {
-                    ((MainFragment) fragment).commitPlaylistTabs();
-                }
-
-                disposables.add(PlaylistDialog.createCorrespondingDialog(requireContext(),
-                        List.of(new StreamEntity(info)),
-                        dialog -> dialog.show(getParentFragmentManager(), TAG)));
-            }
-        }));
-        binding.detailControlsDownload.setOnClickListener(v -> {
-            if (PermissionHelper.checkStoragePermissions(activity,
-                    PermissionHelper.DOWNLOAD_DIALOG_REQUEST_CODE)) {
-                openDownloadDialog();
-            }
+        binding.btnNext.setOnClickListener(v -> {
+            if (isPlayerAvailable()) player.playNext();
         });
-        binding.detailControlsShare.setOnClickListener(makeOnClickListener(info ->
-                ShareUtils.shareText(requireContext(), info.getName(), info.getUrl(),
-                        info.getThumbnails())));
-        binding.detailControlsOpenInBrowser.setOnClickListener(makeOnClickListener(info ->
-                ShareUtils.openUrlInBrowser(requireContext(), info.getUrl())));
-        binding.detailControlsPlayWithKodi.setOnClickListener(makeOnClickListener(info ->
-                KoreUtils.playWithKore(requireContext(), Uri.parse(info.getUrl()))));
-        if (DEBUG) {
-            binding.detailControlsCrashThePlayer.setOnClickListener(v ->
-                    VideoDetailPlayerCrasher.onCrashThePlayer(requireContext(), player));
-        }
 
+        binding.btnPrev.setOnClickListener(v -> {
+            if (isPlayerAvailable()) player.playPrevious();
+        });
+
+        // Overlay listeners
         final View.OnClickListener overlayListener = v -> bottomSheetBehavior
                 .setState(BottomSheetBehavior.STATE_EXPANDED);
         binding.overlayThumbnail.setOnClickListener(overlayListener);
@@ -531,15 +491,18 @@ public final class VideoDetailFragment
         binding.overlayPlayPauseButton.setOnClickListener(v -> {
             if (playerIsNotStopped()) {
                 player.playPause();
-                player.UIs().get(VideoPlayerUi.class).ifPresent(ui -> ui.hideControls(0, 0));
-                showSystemUi();
             } else {
-                autoPlayEnabled = true; // forcefully start playing
+                autoPlayEnabled = true;
                 openVideoPlayer(false);
             }
-
-            setOverlayPlayPauseImage(isPlayerAvailable() && player.isPlaying());
+            updatePlayPauseButtons();
         });
+    }
+
+    private void updatePlayPauseButtons() {
+        boolean isPlaying = isPlayerAvailable() && player.isPlaying();
+        setOverlayPlayPauseImage(isPlaying);
+        binding.btnPlayPause.setImageResource(isPlaying ? R.drawable.ic_pause : R.drawable.ic_play_arrow);
     }
 
     private View.OnClickListener makeOnClickListener(final Consumer<StreamInfo> consumer) {
@@ -896,50 +859,7 @@ public final class VideoDetailFragment
     //////////////////////////////////////////////////////////////////////////*/
 
     private void initTabs() {
-        if (pageAdapter.getCount() != 0) {
-            selectedTabTag = pageAdapter.getItemTitle(binding.viewPager.getCurrentItem());
-        }
-        pageAdapter.clearAllItems();
-        tabIcons.clear();
-        tabContentDescriptions.clear();
-
-        /*
-        if (shouldShowComments()) {
-            pageAdapter.addFragment(
-                    CommentsFragment.getInstance(serviceId, url, title), COMMENTS_TAB_TAG);
-            tabIcons.add(R.drawable.ic_comment);
-            tabContentDescriptions.add(R.string.comments_tab_description);
-        }
-
-        if (showRelatedItems && binding.relatedItemsLayout == null) {
-            // temp empty fragment. will be updated in handleResult
-            pageAdapter.addFragment(EmptyFragment.newInstance(false), RELATED_TAB_TAG);
-            tabIcons.add(R.drawable.ic_art_track);
-            tabContentDescriptions.add(R.string.related_items_tab_description);
-        }
-
-        if (showDescription) {
-            // temp empty fragment. will be updated in handleResult
-            pageAdapter.addFragment(EmptyFragment.newInstance(false), DESCRIPTION_TAB_TAG);
-            tabIcons.add(R.drawable.ic_description);
-            tabContentDescriptions.add(R.string.description_tab_description);
-        }
-        */
-
-        if (pageAdapter.getCount() == 0) {
-            pageAdapter.addFragment(EmptyFragment.newInstance(true), EMPTY_TAB_TAG);
-        }
-        pageAdapter.notifyDataSetUpdate();
-
-        if (pageAdapter.getCount() >= 2) {
-            final int position = pageAdapter.getItemPositionByTitle(selectedTabTag);
-            if (position != -1) {
-                binding.viewPager.setCurrentItem(position);
-            }
-            updateTabIconsAndContentDescriptions();
-        }
-        // the page adapter now contains tabs: show the tab layout
-        updateTabLayoutVisibility();
+        // Disabled
     }
 
     /**
@@ -959,26 +879,7 @@ public final class VideoDetailFragment
     }
 
     private void updateTabs(@NonNull final StreamInfo info) {
-        if (showRelatedItems) {
-            if (binding.relatedItemsLayout == null) { // phone
-                pageAdapter.updateItem(RELATED_TAB_TAG, RelatedItemsFragment.getInstance(info));
-            } else { // tablet + TV
-                getChildFragmentManager().beginTransaction()
-                        .replace(R.id.relatedItemsLayout, RelatedItemsFragment.getInstance(info))
-                        .commitAllowingStateLoss();
-                binding.relatedItemsLayout.setVisibility(isFullscreen() ? View.GONE : View.VISIBLE);
-            }
-        }
-
-        if (showDescription) {
-            pageAdapter.updateItem(DESCRIPTION_TAB_TAG, new DescriptionFragment(info));
-        }
-
-        binding.viewPager.setVisibility(View.VISIBLE);
-        // make sure the tab layout is visible
-        updateTabLayoutVisibility();
-        pageAdapter.notifyDataSetUpdate();
-        updateTabIconsAndContentDescriptions();
+        // Disabled for Music Player redesign
     }
 
     private boolean shouldShowComments() {
@@ -1032,9 +933,7 @@ public final class VideoDetailFragment
     }
 
     public void scrollToTop() {
-        binding.appBarLayout.setExpanded(true, true);
-        // notify tab layout of scrolling
-        updateTabLayoutVisibility();
+        // Disabled
     }
 
     public void scrollToComment(final CommentsInfoItem comment) {
@@ -1339,39 +1238,11 @@ public final class VideoDetailFragment
      * {@link #MAX_PLAYER_HEIGHT})
      */
     private void setHeightThumbnail() {
-        final DisplayMetrics metrics = getResources().getDisplayMetrics();
-        final boolean isPortrait = metrics.heightPixels > metrics.widthPixels;
-        requireView().getViewTreeObserver().removeOnPreDrawListener(preDrawListener);
-
-        if (isFullscreen()) {
-            final int height = (DeviceUtils.isInMultiWindow(activity)
-                    ? requireView()
-                    : activity.getWindow().getDecorView()).getHeight();
-            // Height is zero when the view is not yet displayed like after orientation change
-            if (height != 0) {
-                setHeightThumbnail(height, metrics);
-            } else {
-                requireView().getViewTreeObserver().addOnPreDrawListener(preDrawListener);
-            }
-        } else {
-            final int height = (int) (isPortrait
-                    ? metrics.widthPixels // Square for music player look
-                    : metrics.heightPixels / 2.0f);
-            setHeightThumbnail(height, metrics);
-        }
+        // Disabled for Music Player redesign as ConstraintLayout handles sizing
     }
 
     private void setHeightThumbnail(final int newHeight, final DisplayMetrics metrics) {
-        binding.detailThumbnailImageView.setLayoutParams(
-                new FrameLayout.LayoutParams(
-                        RelativeLayout.LayoutParams.MATCH_PARENT, newHeight));
-        binding.detailThumbnailImageView.setMinimumHeight(newHeight);
-        if (isPlayerAvailable()) {
-            final int maxHeight = (int) (metrics.heightPixels * MAX_PLAYER_HEIGHT);
-            player.UIs().get(VideoPlayerUi.class).ifPresent(ui ->
-                    ui.getBinding().surfaceView.setHeights(newHeight,
-                            ui.isFullscreen() ? newHeight : maxHeight));
-        }
+        // Disabled for Music Player redesign
     }
 
     private void showContent() {
@@ -1808,7 +1679,7 @@ public final class VideoDetailFragment
                                  final int repeatMode,
                                  final boolean shuffled,
                                  final PlaybackParameters parameters) {
-        setOverlayPlayPauseImage(player != null && player.isPlaying());
+        updatePlayPauseButtons();
 
         switch (state) {
             case Player.STATE_PLAYING:
@@ -1882,7 +1753,7 @@ public final class VideoDetailFragment
     public void onServiceStopped() {
         // the binding could be null at this point, if the app is finishing
         if (binding != null) {
-            setOverlayPlayPauseImage(false);
+            updatePlayPauseButtons();
             if (currentInfo != null) {
                 updateOverlayData(currentInfo.getName(),
                         currentInfo.getUploaderName(),

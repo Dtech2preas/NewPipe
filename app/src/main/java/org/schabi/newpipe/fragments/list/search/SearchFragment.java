@@ -191,7 +191,7 @@ public class SearchFragment extends BaseListFragment<SearchInfo, ListExtractor.I
     /**
      * Set wasLoading to true so when the fragment onResume is called, the initial search is done.
      */
-    private void setSearchOnResume() {
+    protected void setSearchOnResume() {
         wasLoading.set(true);
     }
 
@@ -996,7 +996,7 @@ public class SearchFragment extends BaseListFragment<SearchInfo, ListExtractor.I
         }
     }
 
-    private void setQuery(final int theServiceId,
+    protected void setQuery(final int theServiceId,
                           final String theSearchString,
                           final String[] theContentFilter,
                           final String theSortFilter) {
