@@ -229,6 +229,12 @@ public class SearchFragment extends BaseListFragment<SearchInfo, ListExtractor.I
             searchEditText.setHint(
                     getString(R.string.search_with_service_name,
                             service.getServiceInfo().getName()));
+
+            if (contentFilter.length == 0 && asList(service.getSearchQHFactory()
+                    .getAvailableContentFilter()).contains(
+                            YoutubeSearchQueryHandlerFactory.MUSIC_SONGS)) {
+                contentFilter = new String[]{YoutubeSearchQueryHandlerFactory.MUSIC_SONGS};
+            }
         }
         showSearchOnStart();
         initSearchListeners();
@@ -443,7 +449,6 @@ public class SearchFragment extends BaseListFragment<SearchInfo, ListExtractor.I
         }
 
         int itemId = 0;
-        boolean isFirstItem = true;
         final Context c = getContext();
 
         if (service == null) {
@@ -470,12 +475,21 @@ public class SearchFragment extends BaseListFragment<SearchInfo, ListExtractor.I
                     itemId++,
                     0,
                     ServiceHelper.getTranslatedFilterString(filter, c));
-            if (isFirstItem) {
-                item.setChecked(true);
-                isFirstItem = false;
-            }
         }
         menu.setGroupCheckable(1, true, true);
+
+        if (filterItemCheckedId == -1) {
+            for (int i = 0; i < menuItemToFilterName.size(); i++) {
+                final int id = menuItemToFilterName.keyAt(i);
+                final String filter = menuItemToFilterName.valueAt(i);
+                if (contentFilter.length > 0 && filter.equals(contentFilter[0])) {
+                    filterItemCheckedId = id;
+                    break;
+                } else if (contentFilter.length == 0 && i == 0) {
+                    filterItemCheckedId = id; // Default to first item if no filter set
+                }
+            }
+        }
 
         restoreFilterChecked(menu, filterItemCheckedId);
     }
