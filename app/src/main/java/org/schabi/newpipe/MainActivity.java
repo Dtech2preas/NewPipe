@@ -83,7 +83,6 @@ import org.schabi.newpipe.settings.UpdateSettingsFragment;
 import org.schabi.newpipe.settings.migration.MigrationManager;
 import org.schabi.newpipe.util.Constants;
 import org.schabi.newpipe.util.DeviceUtils;
-import org.schabi.newpipe.util.KioskTranslator;
 import org.schabi.newpipe.util.Localization;
 import org.schabi.newpipe.util.NavigationHelper;
 import org.schabi.newpipe.util.PeertubeHelper;
@@ -284,6 +283,7 @@ public class MainActivity extends AppCompatActivity {
                 .setIcon(R.drawable.ic_history);
 
         //Kiosks
+        /*
         final int currentServiceId = ServiceHelper.getSelectedServiceId(this);
         final StreamingService service = NewPipe.getService(currentServiceId);
 
@@ -296,6 +296,7 @@ public class MainActivity extends AppCompatActivity {
                     .setIcon(KioskTranslator.getKioskIcon(ks));
             kioskMenuItemId++;
         }
+        */
 
         //Settings and About
         drawerLayoutBinding.navigation.getMenu()
@@ -760,12 +761,14 @@ public class MainActivity extends AppCompatActivity {
             // while the app is closed he will see a blank fragment on place of kiosk.
             // Let's open it first
             if (getSupportFragmentManager().getBackStackEntryCount() == 0) {
-                NavigationHelper.openMainFragment(getSupportFragmentManager());
+                NavigationHelper.openSearchFragment(getSupportFragmentManager(),
+                        ServiceHelper.getSelectedServiceId(this), "");
             }
 
             handleIntent(getIntent());
         } else {
-            NavigationHelper.gotoMainFragment(getSupportFragmentManager());
+            NavigationHelper.openSearchFragment(getSupportFragmentManager(),
+                    ServiceHelper.getSelectedServiceId(this), "");
         }
     }
 
