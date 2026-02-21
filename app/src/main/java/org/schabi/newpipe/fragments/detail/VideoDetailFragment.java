@@ -24,24 +24,20 @@ import android.content.pm.ActivityInfo;
 import android.database.ContentObserver;
 import android.graphics.Color;
 import android.graphics.Rect;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.Settings;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import androidx.annotation.AttrRes;
@@ -65,7 +61,6 @@ import com.google.android.material.tabs.TabLayout;
 
 import org.schabi.newpipe.App;
 import org.schabi.newpipe.R;
-import org.schabi.newpipe.database.stream.model.StreamEntity;
 import org.schabi.newpipe.databinding.FragmentVideoDetailBinding;
 import org.schabi.newpipe.download.DownloadDialog;
 import org.schabi.newpipe.error.ErrorInfo;
@@ -84,14 +79,9 @@ import org.schabi.newpipe.extractor.stream.StreamType;
 import org.schabi.newpipe.extractor.stream.VideoStream;
 import org.schabi.newpipe.fragments.BackPressable;
 import org.schabi.newpipe.fragments.BaseStateFragment;
-import org.schabi.newpipe.fragments.EmptyFragment;
-import org.schabi.newpipe.fragments.MainFragment;
 import org.schabi.newpipe.fragments.list.comments.CommentsFragment;
-import org.schabi.newpipe.fragments.list.videos.RelatedItemsFragment;
 import org.schabi.newpipe.ktx.AnimationType;
-import org.schabi.newpipe.local.dialog.PlaylistDialog;
 import org.schabi.newpipe.local.history.HistoryRecordManager;
-import org.schabi.newpipe.local.playlist.LocalPlaylistFragment;
 import org.schabi.newpipe.player.Player;
 import org.schabi.newpipe.player.PlayerIntentType;
 import org.schabi.newpipe.player.PlayerService;
@@ -472,11 +462,15 @@ public final class VideoDetailFragment
         });
 
         binding.btnNext.setOnClickListener(v -> {
-            if (isPlayerAvailable()) player.playNext();
+            if (isPlayerAvailable()) {
+                player.playNext();
+            }
         });
 
         binding.btnPrev.setOnClickListener(v -> {
-            if (isPlayerAvailable()) player.playPrevious();
+            if (isPlayerAvailable()) {
+                player.playPrevious();
+            }
         });
 
         // Overlay listeners
@@ -487,7 +481,8 @@ public final class VideoDetailFragment
         binding.overlayButtonsLayout.setOnClickListener(overlayListener);
         binding.overlayCloseButton.setOnClickListener(v -> bottomSheetBehavior
                 .setState(BottomSheetBehavior.STATE_HIDDEN));
-        binding.overlayPlayQueueButton.setOnClickListener(v -> openPlayQueue(requireContext()));
+        binding.overlayPlayQueueButton.setOnClickListener(v ->
+                openPlayQueue(requireContext()));
         binding.overlayPlayPauseButton.setOnClickListener(v -> {
             if (playerIsNotStopped()) {
                 player.playPause();
@@ -500,9 +495,11 @@ public final class VideoDetailFragment
     }
 
     private void updatePlayPauseButtons() {
-        boolean isPlaying = isPlayerAvailable() && player.isPlaying();
+        final boolean isPlaying = isPlayerAvailable() && player.isPlaying();
         setOverlayPlayPauseImage(isPlaying);
-        binding.btnPlayPause.setImageResource(isPlaying ? R.drawable.ic_pause : R.drawable.ic_play_arrow);
+        binding.btnPlayPause.setImageResource(isPlaying
+                ? R.drawable.ic_pause
+                : R.drawable.ic_play_arrow);
     }
 
     private View.OnClickListener makeOnClickListener(final Consumer<StreamInfo> consumer) {
@@ -525,12 +522,10 @@ public final class VideoDetailFragment
             }
         }));
 
-        binding.detailControlsBackground.setOnLongClickListener(makeOnLongClickListener(info ->
-            openBackgroundPlayer(true)
-        ));
-        binding.detailControlsPopup.setOnLongClickListener(makeOnLongClickListener(info ->
-            openPopupPlayer(true)
-        ));
+        binding.detailControlsBackground.setOnLongClickListener(
+                makeOnLongClickListener(info -> openBackgroundPlayer(true)));
+        binding.detailControlsPopup.setOnLongClickListener(
+                makeOnLongClickListener(info -> openPopupPlayer(true)));
         binding.detailControlsDownload.setOnLongClickListener(makeOnLongClickListener(info ->
                 NavigationHelper.openDownloads(activity)));
 
@@ -1213,23 +1208,6 @@ public final class VideoDetailFragment
         binding.playerPlaceholder.requestLayout();
     }
 
-    private final ViewTreeObserver.OnPreDrawListener preDrawListener =
-            new ViewTreeObserver.OnPreDrawListener() {
-                @Override
-                public boolean onPreDraw() {
-                    final DisplayMetrics metrics = getResources().getDisplayMetrics();
-
-                    if (getView() != null) {
-                        final int height = (DeviceUtils.isInMultiWindow(activity)
-                                ? requireView()
-                                : activity.getWindow().getDecorView()).getHeight();
-                        setHeightThumbnail(height, metrics);
-                        getView().getViewTreeObserver().removeOnPreDrawListener(preDrawListener);
-                    }
-                    return false;
-                }
-            };
-
     /**
      * Method which controls the size of thumbnail and the size of main player inside
      * a layout with thumbnail. It decides what height the player should have in both
@@ -1239,10 +1217,6 @@ public final class VideoDetailFragment
      */
     private void setHeightThumbnail() {
         // Disabled for Music Player redesign as ConstraintLayout handles sizing
-    }
-
-    private void setHeightThumbnail(final int newHeight, final DisplayMetrics metrics) {
-        // Disabled for Music Player redesign
     }
 
     private void showContent() {

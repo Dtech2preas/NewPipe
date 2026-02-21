@@ -36,7 +36,7 @@ public class LocalPlaylistManager {
         playlistStreamTable = db.playlistStreamDAO();
     }
 
-    public Maybe<Long> getPlaylistId(String name) {
+    public Maybe<Long> getPlaylistId(final String name) {
         return playlistTable.getPlaylistIdByName(name)
                 .firstElement()
                 .filter(list -> !list.isEmpty())

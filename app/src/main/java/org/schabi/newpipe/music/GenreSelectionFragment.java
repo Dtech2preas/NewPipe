@@ -26,26 +26,29 @@ public class GenreSelectionFragment extends BaseStateFragment<Void> {
 
     private FragmentGenreSelectionBinding binding;
     private static final String[] PREDEFINED_GENRES = {
-            "Hip Hop", "R&B", "Pop", "Rock", "Jazz", "Classical", "Electronic", "Country", "Amapiano", "Reggae"
+            "Hip Hop", "R&B", "Pop", "Rock", "Jazz", "Classical",
+            "Electronic", "Country", "Amapiano", "Reggae"
     };
     public static final String PREF_SELECTED_GENRES = "music_selected_genres";
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull final LayoutInflater inflater,
+                             @Nullable final ViewGroup container,
+                             @Nullable final Bundle savedInstanceState) {
         binding = FragmentGenreSelectionBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
 
     @Override
-    public void startLoading(boolean forceLoad) {
+    public void startLoading(final boolean forceLoad) {
         // No loading needed
     }
 
     @Override
-    protected void initViews(View rootView, Bundle savedInstanceState) {
+    protected void initViews(final View rootView, final Bundle savedInstanceState) {
         super.initViews(rootView, savedInstanceState);
 
-        for (String genre : PREDEFINED_GENRES) {
+        for (final String genre : PREDEFINED_GENRES) {
             addChip(genre);
         }
 
@@ -53,8 +56,8 @@ public class GenreSelectionFragment extends BaseStateFragment<Void> {
         binding.btnDone.setOnClickListener(v -> saveAndContinue());
     }
 
-    private void addChip(String text) {
-        Chip chip = new Chip(getContext());
+    private void addChip(final String text) {
+        final Chip chip = new Chip(getContext());
         chip.setText(text);
         chip.setCheckable(true);
         chip.setClickable(true);
@@ -62,7 +65,7 @@ public class GenreSelectionFragment extends BaseStateFragment<Void> {
     }
 
     private void showAddCustomDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle("Add Custom Genre");
 
         final EditText input = new EditText(getContext());
@@ -70,7 +73,7 @@ public class GenreSelectionFragment extends BaseStateFragment<Void> {
         builder.setView(input);
 
         builder.setPositiveButton("Add", (dialog, which) -> {
-            String genre = input.getText().toString();
+            final String genre = input.getText().toString();
             if (!genre.isEmpty()) {
                 addChip(genre);
             }
@@ -81,18 +84,19 @@ public class GenreSelectionFragment extends BaseStateFragment<Void> {
     }
 
     private void saveAndContinue() {
-        Set<String> selectedGenres = new HashSet<>();
+        final Set<String> selectedGenres = new HashSet<>();
         for (int i = 0; i < binding.chipGroupGenres.getChildCount(); i++) {
-            View child = binding.chipGroupGenres.getChildAt(i);
+            final View child = binding.chipGroupGenres.getChildAt(i);
             if (child instanceof Chip) {
-                Chip chip = (Chip) child;
+                final Chip chip = (Chip) child;
                 if (chip.isChecked()) {
                     selectedGenres.add(chip.getText().toString());
                 }
             }
         }
 
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(requireContext());
+        final SharedPreferences prefs =
+                PreferenceManager.getDefaultSharedPreferences(requireContext());
         prefs.edit().putStringSet(PREF_SELECTED_GENRES, selectedGenres).apply();
 
         NavigationHelper.openMusicHomeFragment(getParentFragmentManager());

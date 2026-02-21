@@ -40,7 +40,9 @@ public class MusicHomeFragment extends BaseStateFragment<Void> {
     private final CompositeDisposable disposables = new CompositeDisposable();
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull final LayoutInflater inflater,
+                             @Nullable final ViewGroup container,
+                             @Nullable final Bundle savedInstanceState) {
         binding = FragmentMusicHomeBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
@@ -53,7 +55,7 @@ public class MusicHomeFragment extends BaseStateFragment<Void> {
     }
 
     @Override
-    protected void initViews(View rootView, Bundle savedInstanceState) {
+    protected void initViews(final View rootView, final Bundle savedInstanceState) {
         super.initViews(rootView, savedInstanceState);
         setTitle(requireContext().getString(org.schabi.newpipe.R.string.action_home));
         historyRecordManager = new HistoryRecordManager(requireContext());
@@ -64,17 +66,24 @@ public class MusicHomeFragment extends BaseStateFragment<Void> {
 
     private void setupHistory() {
         historyAdapter = new HorizontalStreamAdapter();
-        binding.rvRecentlyPlayed.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.HORIZONTAL, false));
+        binding.rvRecentlyPlayed.setLayoutManager(
+                new LinearLayoutManager(getContext(), RecyclerView.HORIZONTAL, false));
         binding.rvRecentlyPlayed.setAdapter(historyAdapter);
-        historyAdapter.setOnItemClickListener(item -> NavigationHelper.openVideoDetail(requireContext(), item.getServiceId(), item.getUrl(), item.getName(), null, false));
+        historyAdapter.setOnItemClickListener(
+                item -> NavigationHelper.openVideoDetail(requireContext(),
+                        item.getServiceId(),
+                        item.getUrl(),
+                        item.getName(),
+                        null,
+                        false));
 
         // Load history
         disposables.add(historyRecordManager.getStreamHistorySortedById()
                 .firstElement()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(history -> {
-                    List<InfoItem> items = new ArrayList<>();
-                    for (var entry : history) {
+                    final List<InfoItem> items = new ArrayList<>();
+                    for (final var entry : history) {
                         items.add(entry.toStreamInfoItem());
                     }
                     if (items.isEmpty()) {
@@ -87,34 +96,47 @@ public class MusicHomeFragment extends BaseStateFragment<Void> {
     }
 
     private void setupGenres() {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(requireContext());
-        Set<String> genres = prefs.getStringSet(GenreSelectionFragment.PREF_SELECTED_GENRES, Collections.emptySet());
+        final SharedPreferences prefs = PreferenceManager
+                .getDefaultSharedPreferences(requireContext());
+        final Set<String> genres = prefs.getStringSet(
+                GenreSelectionFragment.PREF_SELECTED_GENRES, Collections.emptySet());
 
-        int padding = DeviceUtils.dpToPx(16, requireContext());
+        final int padding = DeviceUtils.dpToPx(16, requireContext());
 
-        for (String genre : genres) {
+        for (final String genre : genres) {
             // Inflate header and list manually or use a layout
-            TextView header = new TextView(getContext());
+            final TextView header = new TextView(getContext());
             header.setText(genre);
-            header.setTextAppearance(getContext(), androidx.appcompat.R.style.TextAppearance_AppCompat_Title);
+            header.setTextAppearance(getContext(),
+                    androidx.appcompat.R.style.TextAppearance_AppCompat_Title);
             header.setPadding(padding, padding, padding, padding / 2);
 
-            RecyclerView list = new RecyclerView(getContext());
-            list.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.HORIZONTAL, false));
+            final RecyclerView list = new RecyclerView(getContext());
+            list.setLayoutManager(new LinearLayoutManager(getContext(),
+                    RecyclerView.HORIZONTAL, false));
             list.setPadding(padding, 0, padding, 0);
             list.setClipToPadding(false);
 
-            HorizontalStreamAdapter adapter = new HorizontalStreamAdapter();
+            final HorizontalStreamAdapter adapter = new HorizontalStreamAdapter();
             list.setAdapter(adapter);
-            adapter.setOnItemClickListener(item -> NavigationHelper.openVideoDetail(requireContext(), item.getServiceId(), item.getUrl(), item.getName(), null, false));
+            adapter.setOnItemClickListener(item -> NavigationHelper.openVideoDetail(
+                    requireContext(),
+                    item.getServiceId(),
+                    item.getUrl(),
+                    item.getName(),
+                    null,
+                    false));
 
             binding.homeContentContainer.addView(header);
             binding.homeContentContainer.addView(list);
 
             // Fetch content
-            int serviceId = ServiceHelper.getSelectedServiceId(requireContext());
+            final int serviceId = ServiceHelper.getSelectedServiceId(requireContext());
 
-            disposables.add(ExtractorHelper.searchFor(serviceId, genre + " music", Collections.singletonList(YoutubeSearchQueryHandlerFactory.MUSIC_SONGS), "")
+            disposables.add(ExtractorHelper.searchFor(serviceId,
+                            genre + " music",
+                            Collections.singletonList(YoutubeSearchQueryHandlerFactory.MUSIC_SONGS),
+                            "")
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(result -> {
@@ -126,5 +148,6 @@ public class MusicHomeFragment extends BaseStateFragment<Void> {
     }
 
     @Override
-    public void startLoading(boolean forceLoad) {}
+    public void startLoading(final boolean forceLoad) {
+    }
 }

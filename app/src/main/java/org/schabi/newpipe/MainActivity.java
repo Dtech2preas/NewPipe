@@ -27,25 +27,17 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
 import android.view.KeyEvent;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.webkit.WebView;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
-import android.widget.Spinner;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -59,18 +51,11 @@ import androidx.preference.PreferenceManager;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
 import org.schabi.newpipe.databinding.ActivityMainBinding;
-import org.schabi.newpipe.databinding.DrawerHeaderBinding;
-import org.schabi.newpipe.databinding.DrawerLayoutBinding;
-import org.schabi.newpipe.databinding.InstanceSpinnerLayoutBinding;
 import org.schabi.newpipe.databinding.ToolbarLayoutBinding;
 import org.schabi.newpipe.error.ErrorUtil;
-import org.schabi.newpipe.extractor.NewPipe;
 import org.schabi.newpipe.extractor.StreamingService;
 import org.schabi.newpipe.extractor.comments.CommentsInfoItem;
-import org.schabi.newpipe.extractor.exceptions.ExtractionException;
-import org.schabi.newpipe.extractor.services.peertube.PeertubeInstance;
 import org.schabi.newpipe.fragments.BackPressable;
-import org.schabi.newpipe.fragments.MainFragment;
 import org.schabi.newpipe.fragments.detail.VideoDetailFragment;
 import org.schabi.newpipe.fragments.list.comments.CommentRepliesFragment;
 import org.schabi.newpipe.fragments.list.search.SearchFragment;
@@ -86,18 +71,14 @@ import org.schabi.newpipe.util.Constants;
 import org.schabi.newpipe.util.DeviceUtils;
 import org.schabi.newpipe.util.Localization;
 import org.schabi.newpipe.util.NavigationHelper;
-import org.schabi.newpipe.util.PeertubeHelper;
 import org.schabi.newpipe.util.PermissionHelper;
 import org.schabi.newpipe.util.ReleaseVersionUtil;
 import org.schabi.newpipe.util.SerializedCache;
 import org.schabi.newpipe.util.ServiceHelper;
 import org.schabi.newpipe.util.StateSaver;
 import org.schabi.newpipe.util.ThemeHelper;
-import org.schabi.newpipe.util.external_communication.ShareUtils;
 import org.schabi.newpipe.views.FocusOverlayView;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
@@ -112,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
 
     // private ActionBarDrawerToggle toggle;
 
-    private boolean servicesShown = false;
+    // private boolean servicesShown = false;
 
     private BroadcastReceiver broadcastReceiver;
 
@@ -155,7 +136,8 @@ public class MainActivity extends AppCompatActivity {
 
         mainBinding = ActivityMainBinding.inflate(getLayoutInflater());
         // drawerLayoutBinding = mainBinding.drawerLayout;
-        // drawerHeaderBinding = DrawerHeaderBinding.bind(drawerLayoutBinding.navigation.getHeaderView(0));
+        // drawerHeaderBinding = DrawerHeaderBinding.bind(drawerLayoutBinding.navigation
+        //      .getHeaderView(0));
         toolbarLayoutBinding = mainBinding.toolbarLayout;
         setContentView(mainBinding.getRoot());
 
@@ -216,14 +198,16 @@ public class MainActivity extends AppCompatActivity {
         sharedPrefEditor.putBoolean(KEY_IS_IN_BACKGROUND, true).apply();
         Log.d(TAG, "App moved to background");
     }
+
     private void setupBottomNavigation() {
         mainBinding.bottomNavigation.setOnItemSelectedListener(item -> {
-            int id = item.getItemId();
+            final int id = item.getItemId();
             if (id == R.id.action_home) {
                 NavigationHelper.openMusicHomeFragment(getSupportFragmentManager());
                 return true;
             } else if (id == R.id.action_search) {
-                NavigationHelper.openMusicSearchFragment(getSupportFragmentManager(), ServiceHelper.getSelectedServiceId(this), "");
+                NavigationHelper.openMusicSearchFragment(getSupportFragmentManager(),
+                        ServiceHelper.getSelectedServiceId(this), "");
                 return true;
             } else if (id == R.id.action_library) {
                 NavigationHelper.openMusicLibraryFragment(getSupportFragmentManager());
@@ -486,7 +470,8 @@ public class MainActivity extends AppCompatActivity {
             // while the app is closed he will see a blank fragment on place of kiosk.
             // Let's open it first
             if (getSupportFragmentManager().getBackStackEntryCount() == 0) {
-                if (sharedPreferences.getStringSet(GenreSelectionFragment.PREF_SELECTED_GENRES, null) == null) {
+                if (sharedPreferences.getStringSet(
+                        GenreSelectionFragment.PREF_SELECTED_GENRES, null) == null) {
                     NavigationHelper.openGenreSelectionFragment(getSupportFragmentManager());
                 } else {
                     NavigationHelper.openMusicHomeFragment(getSupportFragmentManager());
@@ -495,7 +480,8 @@ public class MainActivity extends AppCompatActivity {
 
             handleIntent(getIntent());
         } else {
-            if (sharedPreferences.getStringSet(GenreSelectionFragment.PREF_SELECTED_GENRES, null) == null) {
+            if (sharedPreferences.getStringSet(
+                    GenreSelectionFragment.PREF_SELECTED_GENRES, null) == null) {
                 NavigationHelper.openGenreSelectionFragment(getSupportFragmentManager());
             } else {
                 NavigationHelper.openMusicHomeFragment(getSupportFragmentManager());
@@ -514,13 +500,13 @@ public class MainActivity extends AppCompatActivity {
 
         mainBinding.getRoot().setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
 
-        boolean canGoBack = getSupportFragmentManager().getBackStackEntryCount() > 0;
+        final boolean canGoBack = getSupportFragmentManager().getBackStackEntryCount() > 0;
         getSupportActionBar().setDisplayHomeAsUpEnabled(canGoBack);
 
         if (canGoBack) {
-             toolbarLayoutBinding.toolbar.setNavigationOnClickListener(v -> onHomeButtonPressed());
+            toolbarLayoutBinding.toolbar.setNavigationOnClickListener(v -> onHomeButtonPressed());
         } else {
-             toolbarLayoutBinding.toolbar.setNavigationOnClickListener(null);
+            toolbarLayoutBinding.toolbar.setNavigationOnClickListener(null);
         }
     }
 

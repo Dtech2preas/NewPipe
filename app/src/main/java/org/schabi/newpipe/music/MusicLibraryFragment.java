@@ -23,11 +23,12 @@ public class MusicLibraryFragment extends Fragment {
     private final CompositeDisposable disposables = new CompositeDisposable();
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
+    public void onCreate(@Nullable final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         if (savedInstanceState == null) {
-            LocalPlaylistManager playlistManager = new LocalPlaylistManager(NewPipeDatabase.getInstance(requireContext()));
+            final LocalPlaylistManager playlistManager = new LocalPlaylistManager(
+                    NewPipeDatabase.getInstance(requireContext()));
 
             disposables.add(playlistManager.getPlaylistId(LIBRARY_PLAYLIST_NAME)
                     .subscribeOn(Schedulers.io())
@@ -40,15 +41,17 @@ public class MusicLibraryFragment extends Fragment {
         }
     }
 
-    private void createAndOpenPlaylist(LocalPlaylistManager manager) {
+    private void createAndOpenPlaylist(final LocalPlaylistManager manager) {
         disposables.add(manager.createEmptyPlaylist(LIBRARY_PLAYLIST_NAME)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::openPlaylist, Throwable::printStackTrace));
     }
 
-    private void openPlaylist(long id) {
-        if (!isAdded()) return;
+    private void openPlaylist(final long id) {
+        if (!isAdded()) {
+            return;
+        }
 
         getParentFragmentManager().beginTransaction()
                 .replace(getId(), LocalPlaylistFragment.getInstance(id, LIBRARY_PLAYLIST_NAME))
@@ -57,7 +60,9 @@ public class MusicLibraryFragment extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull final LayoutInflater inflater,
+                             @Nullable final ViewGroup container,
+                             @Nullable final Bundle savedInstanceState) {
         return new View(getContext());
     }
 
