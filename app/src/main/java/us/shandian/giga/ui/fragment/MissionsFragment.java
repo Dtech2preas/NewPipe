@@ -289,6 +289,9 @@ public class MissionsFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        if (getActivity() != null) {
+            getActivity().setTitle(R.string.downloads_title);
+        }
 
         if (mAdapter != null) {
             mAdapter.onResume();

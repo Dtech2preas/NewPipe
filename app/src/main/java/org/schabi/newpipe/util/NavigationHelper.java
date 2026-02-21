@@ -48,6 +48,7 @@ import org.schabi.newpipe.fragments.list.channel.ChannelFragment;
 import org.schabi.newpipe.fragments.list.comments.CommentRepliesFragment;
 import org.schabi.newpipe.fragments.list.kiosk.KioskFragment;
 import org.schabi.newpipe.fragments.list.playlist.PlaylistFragment;
+import org.schabi.newpipe.fragments.list.search.MusicSearchFragment;
 import org.schabi.newpipe.fragments.list.search.SearchFragment;
 import org.schabi.newpipe.local.bookmark.BookmarkFragment;
 import org.schabi.newpipe.local.feed.FeedFragment;
@@ -55,7 +56,11 @@ import org.schabi.newpipe.local.history.StatisticsPlaylistFragment;
 import org.schabi.newpipe.local.playlist.LocalPlaylistFragment;
 import org.schabi.newpipe.local.subscription.SubscriptionFragment;
 import org.schabi.newpipe.local.subscription.SubscriptionsImportFragment;
+import org.schabi.newpipe.music.GenreSelectionFragment;
+import org.schabi.newpipe.music.MusicHomeFragment;
+import org.schabi.newpipe.music.MusicLibraryFragment;
 import org.schabi.newpipe.player.PlayQueueActivity;
+import us.shandian.giga.ui.fragment.MissionsFragment;
 import org.schabi.newpipe.player.Player;
 import org.schabi.newpipe.player.PlayerIntentType;
 import org.schabi.newpipe.player.PlayerService;
@@ -383,6 +388,15 @@ public final class NavigationHelper {
                 .commit();
     }
 
+    public static void openMusicSearchFragment(final FragmentManager fragmentManager,
+                                               final int serviceId, final String searchString) {
+        defaultTransaction(fragmentManager)
+                .replace(R.id.fragment_holder,
+                        MusicSearchFragment.getInstance(serviceId, searchString))
+                .addToBackStack(SEARCH_FRAGMENT_TAG)
+                .commit();
+    }
+
     public static void expandMainPlayer(final Context context) {
         context.sendBroadcast(new Intent(VideoDetailFragment.ACTION_SHOW_MAIN_PLAYER));
     }
@@ -607,6 +621,34 @@ public final class NavigationHelper {
                                                        final int serviceId) {
         defaultTransaction(fragmentManager)
                 .replace(R.id.fragment_holder, SubscriptionsImportFragment.getInstance(serviceId))
+                .addToBackStack(null)
+                .commit();
+    }
+
+    public static void openGenreSelectionFragment(final FragmentManager fragmentManager) {
+        fragmentManager.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        defaultTransaction(fragmentManager)
+                .replace(R.id.fragment_holder, new GenreSelectionFragment())
+                .commit();
+    }
+
+    public static void openMusicHomeFragment(final FragmentManager fragmentManager) {
+        fragmentManager.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        defaultTransaction(fragmentManager)
+                .replace(R.id.fragment_holder, new MusicHomeFragment())
+                .commit();
+    }
+
+    public static void openMusicLibraryFragment(final FragmentManager fragmentManager) {
+        defaultTransaction(fragmentManager)
+                .replace(R.id.fragment_holder, new MusicLibraryFragment())
+                .addToBackStack(null)
+                .commit();
+    }
+
+    public static void openDownloadsFragment(final FragmentManager fragmentManager) {
+        defaultTransaction(fragmentManager)
+                .replace(R.id.fragment_holder, new MissionsFragment())
                 .addToBackStack(null)
                 .commit();
     }

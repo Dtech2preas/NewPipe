@@ -32,6 +32,9 @@ interface PlaylistDAO : BasicDAO<PlaylistEntity> {
     @Query("DELETE FROM playlists WHERE uid = :playlistId")
     fun deletePlaylist(playlistId: Long): Int
 
+    @Query("SELECT uid FROM playlists WHERE name = :name")
+    fun getPlaylistIdByName(name: String): Flowable<List<Long>>
+
     @get:Query("SELECT COUNT(*) FROM playlists")
     val count: Flowable<Long>
 

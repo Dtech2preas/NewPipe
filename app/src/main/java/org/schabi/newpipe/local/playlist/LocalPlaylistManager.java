@@ -36,6 +36,23 @@ public class LocalPlaylistManager {
         playlistStreamTable = db.playlistStreamDAO();
     }
 
+    public Maybe<Long> getPlaylistId(final String name) {
+        return playlistTable.getPlaylistIdByName(name)
+                .firstElement()
+                .filter(list -> !list.isEmpty())
+                .map(list -> list.get(0))
+                .subscribeOn(Schedulers.io());
+    }
+
+    public Maybe<Long> createEmptyPlaylist(final String name) {
+        return Maybe.fromCallable(() -> database.runInTransaction(() -> {
+                    final PlaylistEntity newPlaylist = new PlaylistEntity(0L, name, false,
+                            PlaylistEntity.DEFAULT_THUMBNAIL_ID, -1);
+                    return playlistTable.insert(newPlaylist);
+                }
+        )).subscribeOn(Schedulers.io());
+    }
+
     public Maybe<List<Long>> createPlaylist(final String name, final List<StreamEntity> streams) {
         // Disallow creation of empty playlists
         if (streams.isEmpty()) {
